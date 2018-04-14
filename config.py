@@ -8,6 +8,6 @@ config = {
 	'window':66,
 	'batch_size':32,
 	'learning_rate':1e-5,
-	'testing_ratio:'0.1,
+	'testing_ratio':0.1,
 }
 
