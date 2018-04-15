@@ -26,7 +26,7 @@ class DataManager:
         INDEX = pd.read_hdf('./data/'+index+'_index.h5')['close'][start:end]
 
         # read input data
-        items = ['close','open','high','low','volume']
+        items = ['close','open','high','low']#,'volume']
         data = {}
         for k, item in enumerate(items):
             temp = pd.read_hdf('./data/'+index+'.h5',item)[start:end].dropna(1) 
@@ -79,20 +79,33 @@ class DataManager:
 
 
     def get_data(self):
+        print('loading data ...')
         data, I = self.load_data(self.index, start=self.start, end=self.end)
+        data = data.astype(np.float64)
+        I = I.astype(np.float64)
         S = self._to_price_tensor(data, self.window)
-        y = data[self.window:,:,0]/data[self.window-1:-1,:,0] # close price
-        I = I[self.window:]/I[self.window-1:-1]
+        # (n_data, n_assets, window, n_features)
+        
+        S[1:] = ( S[1:] / S[:-1,:,:,0, None] -1) *10 #open high low close
+        S = S[1:]
+        y = (data[self.window:,:,0]/data[self.window-1:-1,:,0] - 1)*10 # close price
+        I = (I[self.window:]/I[self.window-1:-1] - 1)*10
         I = I.reshape(-1,)
+
+        # adjust time
+        S = S[:-1]
+        y = y[1:]
+        I = I[1:]
+
         # split training and testing data
         truncate = int(S.shape[0]*(1-self.testing_ratio))
-        S_train = S[:truncate]
-        y_train = y[:truncate]
-        I_train = I[:truncate]
+        S_train = S[:truncate].astype(np.float32)
+        y_train = y[:truncate].astype(np.float32)
+        I_train = I[:truncate].astype(np.float32)
 
-        S_test = S[truncate:]
-        y_test = y[truncate:]
-        I_test = I[truncate:]
+        S_test = S[truncate:].astype(np.float32)
+        y_test = y[truncate:].astype(np.float32)
+        I_test = I[truncate:].astype(np.float32)
 
         print('loading data complete')
         print('='*30)
@@ -102,5 +115,7 @@ class DataManager:
         print('number of window:', S.shape[2])
         print('number of features:', S.shape[3])
         print('='*30)
+
+
 
         return S_train, y_train, I_train, S_test, y_test, I_test 
