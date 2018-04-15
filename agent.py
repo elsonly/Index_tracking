@@ -1,22 +1,17 @@
 import numpy as np
 import tensorflow as tf
+from config import *
 
-
-#from network import CNN
-from network_new import CNN
+from network import CNN
+#from network_new import CNN
 from preprocessing import DataManager
 
 
 class Agent:
     def __init__(self, config):
         self.batch_size = config['batch_size']
-
-        self.dm = DataManager(index=config['index'],
-                start=config['start'],
-                end=config['end'],
-                rng=config['rng'],
-                standard=config['standard'],
-                window=config['window'])
+        self.continuous_sample = config['continuous_sample']
+        self.dm = DataManager(config)
 
         self.Memory()
 
@@ -40,17 +35,25 @@ class Agent:
         
 
     def Memory(self):
-        S,y,I = self.dm.get_data()
+        S,y,I,S_test,y_test,I_test = self.dm.get_data()
         self.memory = {'S':S,'y':y,'I':I}
         self.memory_size = I.shape[0]
+        self.memory_test = {'S':S_test,'y':y_test,'I':I_test}
 
     def next_batch(self):
-        # sample
-        sample_index = np.random.randint(self.batch_size, self.memory_size)
-        b_S = self.memory['S'][sample_index-self.batch_size:sample_index]
-        b_S = self.dm.normalize(b_S)
-        b_y = self.memory['y'][sample_index-self.batch_size:sample_index]
-        b_I = self.memory['I'][sample_index-self.batch_size:sample_index]
+        if self.continuous_sample:
+            # sample
+            sample_index = np.random.randint(self.batch_size, self.memory_size)
+            b_S = self.memory['S'][sample_index-self.batch_size:sample_index]
+            #b_S = self.dm.normalize(b_S)
+            b_y = self.memory['y'][sample_index-self.batch_size:sample_index]
+            b_I = self.memory['I'][sample_index-self.batch_size:sample_index]
+        else:
+            sample_index = np.random.randint(0, self.memory_size, self.batch_size)
+            b_S = self.memory['S'][sample_index]
+            #b_S = self.dm.normalize(b_S)
+            b_y = self.memory['y'][sample_index]
+            b_I = self.memory['I'][sample_index]
 
         return b_S, b_y, b_I
 
