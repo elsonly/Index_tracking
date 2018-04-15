@@ -4,13 +4,15 @@ import numpy as np
 
 class CNN:
     def __init__(self, n_features, n_assets, window,
-        learning_rate):
+        learning_rate, holding_period):
 
         self.sess = tf.Session()
         self.n_features = n_features
         self.n_assets = n_assets
         self.window = window
+        self.holding_period = holding_period
         self.lr = learning_rate
+
 
         self._build_network()
         self.sess.run(tf.global_variables_initializer())
@@ -21,10 +23,8 @@ class CNN:
                                     [None, self.n_assets, self.window, self.n_features],
                                     name='observations')
 
-            self.y = tf.placeholder(tf.float32, shape=[None, self.n_assets], name='returns')
-            self.I = tf.placeholder(tf.float32, shape=[None,], name='index')
-
-            #self.previous_w = tf.Variable(tf.float32, shape=[None, self.n_assets], name='previous_w')
+            self.y = tf.placeholder(tf.float32, shape=[None, self.n_assets, self.holding_period], name='returns') #(m, n_assets, holding_period)
+            self.I = tf.placeholder(tf.float32, shape=[None, self.holding_period ], name='index') # (m, holding_period)
 
         with tf.name_scope('layers'):
             c1 = tf.layers.conv2d(self.S,
@@ -58,24 +58,17 @@ class CNN:
                                 units=self.n_assets,
                                 activation=tf.nn.softmax,
                                 name='out')
-            out = out[0]
-            self.out = tf.reshape(out, [-1, self.n_assets])
-
+            # out.shape=(?, 1, 1, 66)
         with tf.name_scope('loss'):
-            
+            self.out = tf.reshape(out, [-1, self.n_assets,1])
+
+            #y.shape=(m, n_assets, holding_period)
+            #I.shape=(m, holding_period)
+            #out.shape=(m, n_assets)
             self.pred_ret = tf.reduce_sum(self.y * self.out, axis=1)
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
-
-
+            
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
-
-
-
-            
-
-
-                                    
-
 
 

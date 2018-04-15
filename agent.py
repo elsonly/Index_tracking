@@ -2,10 +2,9 @@ import numpy as np
 import tensorflow as tf
 from config import *
 
-from network import CNN
-#from network_new import CNN
+#from network import CNN
+from network_new import CNN
 from preprocessing import DataManager
-
 
 class Agent:
     def __init__(self, config):
@@ -18,7 +17,8 @@ class Agent:
         self.network = CNN(n_features=self.memory['S'].shape[-1],
                          n_assets=self.memory['S'].shape[1],
                          window=config['window'],
-                         learning_rate=config['learning_rate'])
+                         learning_rate=config['learning_rate'],
+                         holding_period=config['holding_period'])
         
 
     def learn(self,S,y,I):

@@ -12,6 +12,7 @@ class DataManager:
         self.standard = config['standard']
         self.window = config['window']
         self.testing_ratio = config['testing_ratio']
+        self.holding_period = config['holding_period']
 
 
     def _filter(self,data, rng, standard):
@@ -21,7 +22,10 @@ class DataManager:
         return data.loc[:,col_index]
 
 
-    def load_data(self, index, start, end):
+    def load_data(self):
+        index = self.index
+        start = self.start
+        end = self.end
         # read target data
         INDEX = pd.read_hdf('./data/'+index+'_index.h5')['close'][start:end]
 
@@ -70,19 +74,42 @@ class DataManager:
         return rets
 
     def _to_price_tensor(self, data, window):
-        m, n_assets, n_features  = data.shape
-        tensor = np.zeros((m-window+1,n_assets, window, n_features))
-        for i in range(window, m+1):
-            # (n_assets, window, n_features)
-            tensor[i-window] = data[i-window:i].transpose(1,0,2)
+        if len(data.shape)==3:
+            m, n_assets, n_features  = data.shape
+            tensor = np.zeros((m-window+1, n_assets, window, n_features))
+            for i in range(window, m+1):
+                # (n_assets, window, n_features)
+                tensor[i-window] = data[i-window:i].transpose(1,0,2)
+        elif len(data.shape)==2:
+            m, n_assets = data.shape
+            if n_assets == 1:
+                tensor = np.zeros((m-window+1, window))
+                for i in range(window, m+1):
+                    tensor[i-window] = data[i-window:i].reshape(-1,)
+            else:
+                tensor = np.zeros((m-window+1, n_assets, window))
+                for i in range(window, m+1):
+                    
+                    tensor[i-window] = data[i-window:i].transpose(1,0)
+
         return tensor
 
 
     def get_data(self):
         print('loading data ...')
-        data, I = self.load_data(self.index, start=self.start, end=self.end)
+        data, I = self.load_data()
         data = data.astype(np.float64)
         I = I.astype(np.float64)
+        
+        data[1:] = (data[1:,:,:]/data[:-1,:,0,None] - 1 ) * 10
+        data = data[1:]
+
+        S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
+        y = data[:,:,0]
+        I = ( I[1:]/I[:-1] - 1 ) * 10
+        I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
+        y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
+        """
         S = self._to_price_tensor(data, self.window)
         # (n_data, n_assets, window, n_features)
         
@@ -91,8 +118,12 @@ class DataManager:
         y = (data[self.window:,:,0]/data[self.window-1:-1,:,0] - 1)*10 # close price
         I = (I[self.window:]/I[self.window-1:-1] - 1)*10
         I = I.reshape(-1,)
+        """
 
         # adjust time
+        y = y[-S.shape[0]:]
+        I = I[-S.shape[0]:]
+
         S = S[:-1]
         y = y[1:]
         I = I[1:]
@@ -113,9 +144,9 @@ class DataManager:
         print('number of testing data:', S_test.shape[0])
         print('number of assets:', S.shape[1])
         print('number of window:', S.shape[2])
+        print('number of holding_period:', self.holding_period)
         print('number of features:', S.shape[3])
         print('='*30)
 
-
-
         return S_train, y_train, I_train, S_test, y_test, I_test 
+        
