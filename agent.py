@@ -2,8 +2,12 @@ import numpy as np
 import tensorflow as tf
 from config import *
 
-#from network import CNN
-from network_new import CNN
+if config['new']:
+    print('new network')
+    from network_new import CNN
+else:
+    from network import CNN
+
 from preprocessing import DataManager
 
 class Agent:
