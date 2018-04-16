@@ -40,7 +40,7 @@ class CNN:
 
             c2 = tf.layers.conv2d(c1,
                       filters=32,
-                      kernel_size=(2, 2),
+                      kernel_size=(1, 2),
                       strides=(1, 1),
                       padding='valid',
                       data_format='channels_last', 
