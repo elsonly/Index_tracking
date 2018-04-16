@@ -115,10 +115,7 @@ class DataManager:
             I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
             y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
         else:
-            print(I.shape)
-            print(y.shape)
             I = I.reshape(-1,)
-            print(I.shape)
 
 
         # adjust time

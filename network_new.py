@@ -47,25 +47,25 @@ class CNN:
                       activation=tf.nn.relu,
                       name='c2')
 
-            tf.contrib.layers.flatten(c2)
+            flatten = tf.contrib.layers.flatten(c2)
 
-            fc1 = tf.layers.dense(inputs=c2,
+            fc1 = tf.layers.dense(inputs=flatten,
                                 units=32,
                                 activation=tf.nn.relu,
                                 name='fc1')
             #dropout = tf.layers.dropout(inputs=dense, rate=0.4)
-            out = tf.layers.dense(inputs=fc1,
+            self.out = tf.layers.dense(inputs=fc1,
                                 units=self.n_assets,
                                 activation=tf.nn.softmax,
                                 name='out')
-            # out.shape=(?, 1, 1, 66)
         with tf.name_scope('loss'):
-            self.out = tf.reshape(out, [-1, self.n_assets,1])
-
+            #out.shape=(m, n_assets)
+            out = tf.reshape(self.out,[-1, self.n_assets,1])
             #y.shape=(m, n_assets, holding_period)
             #I.shape=(m, holding_period)
-            #out.shape=(m, n_assets)
-            self.pred_ret = tf.reduce_sum(self.y * self.out, axis=1)
+            
+            self.pred_ret = tf.reduce_sum(self.y * out, axis=1)
+            print(self.pred_ret.get_shape())
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
             
         with tf.name_scope('train'):

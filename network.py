@@ -36,7 +36,7 @@ class CNN:
                                   activation=tf.nn.relu,
                                   name='c1')
             #input 4-D Tensor [batch, height, width, in_channels            
-            width = c1.get_shape()[2]
+            #width = c1.get_shape()[2]
 
             c2 = tf.layers.conv2d(c1,
                       filters=32,
@@ -47,25 +47,25 @@ class CNN:
                       activation=tf.nn.relu,
                       name='c2')
 
-            print(c2.get_shape())
 
-            tf.contrib.layers.flatten(c2)
+            flatten = tf.contrib.layers.flatten(c2)
 
-            fc1 = tf.layers.dense(inputs=c2,
+            fc1 = tf.layers.dense(inputs=flatten,
                                 units=32,
                                 activation=tf.nn.relu,
                                 name='fc1')
             #dropout = tf.layers.dropout(inputs=dense, rate=0.4)
-            out = tf.layers.dense(inputs=fc1,
+            self.out = tf.layers.dense(inputs=fc1,
                                 units=self.n_assets,
                                 activation=tf.nn.softmax,
                                 name='out')
-
+            
         with tf.name_scope('loss'):
             
-            self.out = tf.reshape(out, [-1, self.n_assets])
             self.pred_ret = tf.reduce_sum(self.y * self.out, axis=1)
+            print(self.pred_ret.get_shape())
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
+            print(self.loss.get_shape())
 
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
