@@ -10,7 +10,7 @@ LOSS_train = []
 LOSS_test = []
 
 print('start trainning ...')
-for step in range(10000):
+for step in range(config['training_steps']):
 	b_S, b_y, b_I = NNAgent.next_batch()
 	NNAgent.learn(b_S,b_y,b_I)
 

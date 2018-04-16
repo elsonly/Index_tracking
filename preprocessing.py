@@ -74,19 +74,21 @@ class DataManager:
         return rets
 
     def _to_price_tensor(self, data, window):
-        if len(data.shape)==3:
+        if len(data.shape)==3: #S
             m, n_assets, n_features  = data.shape
             tensor = np.zeros((m-window+1, n_assets, window, n_features))
             for i in range(window, m+1):
                 # (n_assets, window, n_features)
                 tensor[i-window] = data[i-window:i].transpose(1,0,2)
+
         elif len(data.shape)==2:
             m, n_assets = data.shape
-            if n_assets == 1:
+
+            if n_assets == 1: # I
                 tensor = np.zeros((m-window+1, window))
                 for i in range(window, m+1):
                     tensor[i-window] = data[i-window:i].reshape(-1,)
-            else:
+            else: # y
                 tensor = np.zeros((m-window+1, n_assets, window))
                 for i in range(window, m+1):
                     
@@ -98,27 +100,26 @@ class DataManager:
     def get_data(self):
         print('loading data ...')
         data, I = self.load_data()
-        data = data.astype(np.float64)
-        I = I.astype(np.float64)
+        data = data.astype(np.float64) # change type
+        I = I.astype(np.float64) # change type
         
-        data[1:] = (data[1:,:,:]/data[:-1,:,0,None] - 1 ) * 10
+        data[1:] = (data[1:,:,:]/data[:-1,:,0,None] - 1 ) * 10 # returns * 10
         data = data[1:]
 
         S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
-        y = data[:,:,0]
-        I = ( I[1:]/I[:-1] - 1 ) * 10
-        I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
-        y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
-        """
-        S = self._to_price_tensor(data, self.window)
-        # (n_data, n_assets, window, n_features)
-        
-        S[1:] = ( S[1:] / S[:-1,:,:,0, None] -1) *10 #open high low close
-        S = S[1:]
-        y = (data[self.window:,:,0]/data[self.window-1:-1,:,0] - 1)*10 # close price
-        I = (I[self.window:]/I[self.window-1:-1] - 1)*10
-        I = I.reshape(-1,)
-        """
+        y = data[:,:,0] #close price
+        I = ( I[1:]/I[:-1] - 1 ) * 10 # returns * 10
+
+
+        if config['new']:
+            I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
+            y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
+        else:
+            print(I.shape)
+            print(y.shape)
+            I = I.reshape(-1,)
+            print(I.shape)
+
 
         # adjust time
         y = y[-S.shape[0]:]
