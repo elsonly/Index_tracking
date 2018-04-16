@@ -46,6 +46,8 @@ class CNN:
                       data_format='channels_last', 
                       activation=tf.nn.relu,
                       name='c2')
+            
+            print(c2.get_shape())
 
             tf.contrib.layers.flatten(c2)
 

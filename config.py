@@ -11,7 +11,7 @@ config = {
 	'learning_rate':1e-5,
 	'testing_ratio':0.1,
 	'continuous_sample':False,
-	'new':True,
+	'new':False,
 
 }
 
