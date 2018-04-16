@@ -28,7 +28,7 @@ class CNN:
 
         with tf.name_scope('layers'):
             c1 = tf.layers.conv2d(self.S,
-                                  filters=3,
+                                  filters=32,
                                   kernel_size=(self.n_assets,2),
                                   strides=(1, 1),
                                   padding='valid', 
@@ -36,11 +36,11 @@ class CNN:
                                   activation=tf.nn.relu,
                                   name='c1')
             #input 4-D Tensor [batch, height, width, in_channels            
-            width = c1.get_shape()[2]
+            #width = c1.get_shape()[2]
 
             c2 = tf.layers.conv2d(c1,
-                      filters=6,
-                      kernel_size=(1, width),
+                      filters=32,
+                      kernel_size=(2, 2),
                       strides=(1, 1),
                       padding='valid',
                       data_format='channels_last', 

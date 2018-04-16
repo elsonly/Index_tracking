@@ -28,7 +28,7 @@ class CNN:
 
         with tf.name_scope('layers'):
             c1 = tf.layers.conv2d(self.S,
-                                  filters=3,
+                                  filters=32,
                                   kernel_size=(self.n_assets,2),
                                   strides=(1, 1),
                                   padding='valid', 
@@ -39,14 +39,14 @@ class CNN:
             width = c1.get_shape()[2]
 
             c2 = tf.layers.conv2d(c1,
-                      filters=6,
-                      kernel_size=(1, width),
+                      filters=32,
+                      kernel_size=(2, 2),
                       strides=(1, 1),
                       padding='valid',
                       data_format='channels_last', 
                       activation=tf.nn.relu,
                       name='c2')
-            
+
             print(c2.get_shape())
 
             tf.contrib.layers.flatten(c2)
