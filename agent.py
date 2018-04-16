@@ -18,11 +18,17 @@ class Agent:
 
         self.Memory()
         print(config['holding_period'])
-        self.network = CNN(n_features=self.memory['S'].shape[-1],
-                         n_assets=self.memory['S'].shape[1],
-                         window=config['window'],
-                         learning_rate=config['learning_rate'],
-                         holding_period=config['holding_period'])
+        if config['new']:
+            self.network = CNN(n_features=self.memory['S'].shape[-1],
+                             n_assets=self.memory['S'].shape[1],
+                             window=config['window'],
+                             learning_rate=config['learning_rate'],
+                             holding_period=config['holding_period'])
+        else:
+            self.network = CNN(n_features=self.memory['S'].shape[-1],
+                             n_assets=self.memory['S'].shape[1],
+                             window=config['window'],
+                             learning_rate=config['learning_rate'])
         
 
     def learn(self,S,y,I):
