@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-#from config import *
+from config import *
 
 if config['new']:
     print('new network')
