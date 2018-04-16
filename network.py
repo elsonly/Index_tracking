@@ -5,8 +5,9 @@ import numpy as np
 class CNN:
     def __init__(self, n_features, n_assets, window,
         learning_rate):
-
-        self.sess = tf.Session()
+        #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+        gpu_options = tf.GPUOptions(allow_growth=True)
+        self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.n_features = n_features
         self.n_assets = n_assets
         self.window = window

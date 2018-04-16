@@ -5,8 +5,9 @@ import numpy as np
 class CNN:
     def __init__(self, n_features, n_assets, window,
         learning_rate, holding_period):
-
-        self.sess = tf.Session()
+        #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+        gpu_options = tf.GPUOptions(allow_growth=True)
+        self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.n_features = n_features
         self.n_assets = n_assets
         self.window = window
@@ -65,7 +66,6 @@ class CNN:
             #I.shape=(m, holding_period)
             
             self.pred_ret = tf.reduce_sum(self.y * out, axis=1)
-            print(self.pred_ret.get_shape())
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
             
         with tf.name_scope('train'):

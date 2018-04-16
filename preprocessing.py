@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from config import *
+#from config import *
 
 class DataManager:
 
