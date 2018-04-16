@@ -17,7 +17,6 @@ class Agent:
         self.dm = DataManager(config)
 
         self.Memory()
-        print(config['holding_period'])
         if config['new']:
             self.network = CNN(n_features=self.memory['S'].shape[-1],
                              n_assets=self.memory['S'].shape[1],
