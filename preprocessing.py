@@ -113,21 +113,20 @@ class DataManager:
         
         data[1:] = (data[1:,:,:]/data[:-1,:,0,None] - 1 ) * 10 # returns * 10
         data = data[1:]
-        price_trucate_index = data>10
-        #print(price_trucate_index.sum())
-        data[price_trucate_index] = 10
+        price_trucate_index = data > 7
+        print(price_trucate_index.sum())
+        data[price_trucate_index] = 0
+        price_trucate_index = data < -7
+        print(price_trucate_index.sum())
+        data[price_trucate_index] = 0
 
         S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
         y = data[:,:,0] #close price
         I = ( I[1:]/I[:-1] - 1 ) * 10 # returns * 10
-
-
-        if config['new']:
-            I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
-            y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
-        else:
-            I = I.reshape(-1,)
-
+        
+        I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
+        y = self._to_price_tensor(y, self.holding_period) # (m, n_assets, holding_period)
+            
 
         # adjust time
         y = y[-S.shape[0]:]

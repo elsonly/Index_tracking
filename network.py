@@ -4,14 +4,16 @@ import numpy as np
 
 class CNN:
     def __init__(self, n_features, n_assets, window,
-        learning_rate):
+        learning_rate, holding_period):
         #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
         gpu_options = tf.GPUOptions(allow_growth=True)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.n_features = n_features
         self.n_assets = n_assets
         self.window = window
+        self.holding_period = holding_period
         self.lr = learning_rate
+
 
         self._build_network()
         self.sess.run(tf.global_variables_initializer())
@@ -22,10 +24,8 @@ class CNN:
                                     [None, self.n_assets, self.window, self.n_features],
                                     name='observations')
 
-            self.y = tf.placeholder(tf.float32, shape=[None, self.n_assets], name='returns')
-            self.I = tf.placeholder(tf.float32, shape=[None,], name='index')
-
-            #self.previous_w = tf.placeholder(tf.float32, shape=[None, self.n_assets], name='previous_w')
+            self.y = tf.placeholder(tf.float32, shape=[None, self.n_assets, self.holding_period], name='returns') #(m, n_assets, holding_period)
+            self.I = tf.placeholder(tf.float32, shape=[None, self.holding_period ], name='index') # (m, holding_period)
 
         with tf.name_scope('layers'):
             c1 = tf.layers.conv2d(self.S,
@@ -48,7 +48,6 @@ class CNN:
                       activation=tf.nn.relu,
                       name='c2')
 
-
             flatten = tf.contrib.layers.flatten(c2)
 
             fc1 = tf.layers.dense(inputs=flatten,
@@ -60,21 +59,16 @@ class CNN:
                                 units=self.n_assets,
                                 activation=tf.nn.softmax,
                                 name='out')
-            
         with tf.name_scope('loss'):
+            #out.shape=(m, n_assets)
+            out = tf.reshape(self.out,[-1, self.n_assets,1])
+            #y.shape=(m, n_assets, holding_period)
+            #I.shape=(m, holding_period)
             
-            self.pred_ret = tf.reduce_sum(self.y * self.out, axis=1)
+            self.pred_ret = tf.reduce_sum(self.y * out, axis=1)
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
-
+            
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
-
-
-
-            
-
-
-                                    
-
 
 
