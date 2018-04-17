@@ -64,9 +64,7 @@ class CNN:
         with tf.name_scope('loss'):
             
             self.pred_ret = tf.reduce_sum(self.y * self.out, axis=1)
-            print(self.pred_ret.get_shape())
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)
-            print(self.loss.get_shape())
 
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss)

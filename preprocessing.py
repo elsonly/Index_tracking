@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-#from config import *
+from config import *
 
 class DataManager:
 
@@ -18,7 +18,15 @@ class DataManager:
     def _filter(self,data, rng, standard):
 
         # filter out continuous same price
-        col_index = data.iloc[-rng:,:].pct_change().std() > standard
+        rng_1 = 300
+        rng_2 = 200
+        rng_3 = 100
+        #col_index = data.iloc[-rng:,:].pct_change().std() > standard
+        cond_1 = data.iloc[-rng_1:,:].pct_change().std() > standard
+        cond_2 = data.iloc[-rng_2:,:].pct_change().std() > standard
+        cond_3 = data.iloc[-rng_3:,:].pct_change().std() > standard
+        col_index = cond_1&cond_2&cond_3
+
         return data.loc[:,col_index]
 
 
@@ -122,9 +130,9 @@ class DataManager:
         y = y[-S.shape[0]:]
         I = I[-S.shape[0]:]
 
-        S = S[:-1]
-        y = y[1:]
-        I = I[1:]
+        S = S[:-self.holding_period]
+        y = y[self.holding_period:]
+        I = I[self.holding_period:]
 
         # split training and testing data
         truncate = int(S.shape[0]*(1-self.testing_ratio))
