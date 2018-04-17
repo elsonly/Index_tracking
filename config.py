@@ -1,5 +1,5 @@
 config = {
-	'index':'XIN9',
+	'index':'tw50',
 	'start':'2006-01-01',
 	'end':'2016-01-01',
 	'rng':300,

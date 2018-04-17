@@ -1,13 +1,7 @@
 import numpy as np
 import tensorflow as tf
-from config import *
 
-if config['new']:
-    print('new network')
-    from network_new import CNN
-else:
-    from network import CNN
-
+from network import CNN
 from preprocessing import DataManager
 
 class Agent:
@@ -17,17 +11,11 @@ class Agent:
         self.dm = DataManager(config)
 
         self.Memory()
-        if config['new']:
-            self.network = CNN(n_features=self.memory['S'].shape[-1],
-                             n_assets=self.memory['S'].shape[1],
-                             window=config['window'],
-                             learning_rate=config['learning_rate'],
-                             holding_period=config['holding_period'])
-        else:
-            self.network = CNN(n_features=self.memory['S'].shape[-1],
-                             n_assets=self.memory['S'].shape[1],
-                             window=config['window'],
-                             learning_rate=config['learning_rate'])
+        self.network = CNN(n_features=self.memory['S'].shape[-1],
+                         n_assets=self.memory['S'].shape[1],
+                         window=config['window'],
+                         learning_rate=config['learning_rate'],
+                         holding_period=config['holding_period'])
         
 
     def learn(self,S,y,I):

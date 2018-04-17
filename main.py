@@ -10,7 +10,7 @@ LOSS_train = []
 LOSS_test = []
 
 print('start trainning ...')
-for step in range(int(3e+5)):
+for step in range(config['training_steps']):
     b_S, b_y, b_I = NNAgent.next_batch()
     NNAgent.learn(b_S,b_y,b_I)
 
@@ -32,20 +32,11 @@ for step in range(int(3e+5)):
         LOSS_test.append(loss_test)
 
 
+#import matplotlib.pyplot as plt
 
-"""
-for i_episode in range(3000):
 
-    observation = env.reset()
 
-    action = RL.choose_action(observation)
-    for day in range(days): #days = 128
-        
 
-        observation_, reward, done, info = env.step(action)
 
-        RL.store_transition(observation, action, reward)    
-  
-    vt = RL.learn()
 
-"""
+
