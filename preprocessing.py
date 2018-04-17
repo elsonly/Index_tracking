@@ -97,9 +97,8 @@ class DataManager:
         data, I = self.load_data()
 
         data = data * 10 # returns * 10
-        
-        S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
         y = S[:,:,0] #close price
+        S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
         I = I * 10 # returns * 10
         
         I = self._to_price_tensor(I, self.holding_period) # (m, holding_period)
