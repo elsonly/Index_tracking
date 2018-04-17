@@ -6,10 +6,11 @@ config = {
 	'standard':1e-4,
 	'training_steps':int(2e+5),
 	'window':128,
-	'holding_period':1,
+	'holding_period':20,
 	'batch_size':32,
 	'learning_rate':1e-5,
-	'testing_ratio':0.1,
+	'validation_ratio':0.1,
+	'testing_period':60,
 	'continuous_sample':False,
 
 }
