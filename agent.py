@@ -32,9 +32,11 @@ class Agent:
         
 
     def Memory(self):
-        S,y,I,S_test,y_test,I_test = self.dm.get_data()
+        S,y,I,S_val,y_val,I_val = self.dm.get_data()
+        S_test, y_test, I_test = self.dm.get_data_testing()
         self.memory = {'S':S,'y':y,'I':I}
         self.memory_size = I.shape[0]
+        self.memory_val = {'S':S_val,'y':y_val,'I':I_val}
         self.memory_test = {'S':S_test,'y':y_test,'I':I_test}
 
     def next_batch(self):
