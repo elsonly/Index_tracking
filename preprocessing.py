@@ -113,6 +113,9 @@ class DataManager:
         
         data[1:] = (data[1:,:,:]/data[:-1,:,0,None] - 1 ) * 10 # returns * 10
         data = data[1:]
+        price_trucate_index = data>10
+        #print(price_trucate_index.sum())
+        data[price_trucate_index] = 10
 
         S = self._to_price_tensor(data, self.window) # (m,n_assets,window,n_feature)
         y = data[:,:,0] #close price
