@@ -20,6 +20,9 @@ class CNN:
             model_path = tf.train.latest_checkpoint(restore)
             saver = tf.train.import_meta_graph(model_path+'.meta')
             saver.restore(self.sess, model_path)
+            all_vars = tf.trainable_variables()
+            for v in all_vars:
+                self.sess.run(v)
         else:
             self._build_network()
             self.sess.run(tf.global_variables_initializer())
