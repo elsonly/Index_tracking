@@ -3,20 +3,29 @@ import numpy as np
 
 
 class CNN:
-    def __init__(self, n_features, n_assets, window,
-        learning_rate, holding_period):
+    def __init__(self, n_features, n_assets, config, restore=None):
         #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
         gpu_options = tf.GPUOptions(allow_growth=True)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.n_features = n_features
         self.n_assets = n_assets
-        self.window = window
-        self.holding_period = holding_period
-        self.lr = learning_rate
 
+        self.window = config['window']
+        self.holding_period = config['holding_period']
+        self.lr = config['learning_rate']
 
-        self._build_network()
-        self.sess.run(tf.global_variables_initializer())
+        
+        if restore:
+            tf.reset_default_graph()
+            model_path = tf.train.latest_checkpoint(restore)
+            saver = tf.train.import_meta_graph(model_path+'.meta')
+            saver.restore(self.sess, model_path)
+        else:
+            self._build_network()
+            self.sess.run(tf.global_variables_initializer())
+
+        if config['save_model']:
+            self.saver = tf.train.Saver()
 
     def _build_network(self):
         with tf.name_scope('inputs'):
@@ -60,10 +69,10 @@ class CNN:
                                 activation=tf.nn.softmax,
                                 name='out')
         with tf.name_scope('loss'):
-            #out.shape=(m, n_assets)
-            out = tf.reshape(self.out,[-1, self.n_assets,1])
-            #y.shape=(m, n_assets, holding_period)
-            #I.shape=(m, holding_period)
+            
+            out = tf.reshape(self.out,[-1, self.n_assets,1]) # out.shape=(m, n_assets)
+                                                             # y.shape=(m, n_assets, holding_period)
+                                                             # I.shape=(m, holding_period)
             
             self.pred_ret = tf.reduce_sum(self.y * out, axis=1)
             self.loss = tf.losses.mean_squared_error(self.I, self.pred_ret)

@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import os
 
 from network import CNN
 from preprocessing import DataManager
@@ -8,14 +9,13 @@ class Agent:
     def __init__(self, config):
         self.batch_size = config['batch_size']
         self.continuous_sample = config['continuous_sample']
+
         self.dm = DataManager(config)
 
         self.Memory()
         self.network = CNN(n_features=self.memory['S'].shape[-1],
                          n_assets=self.memory['S'].shape[1],
-                         window=config['window'],
-                         learning_rate=config['learning_rate'],
-                         holding_period=config['holding_period'])
+                         config=config)
         
 
     def learn(self,S,y,I):
@@ -34,6 +34,7 @@ class Agent:
     def Memory(self):
         S,y,I,S_val,y_val,I_val = self.dm.get_data()
         S_test, y_test, I_test = self.dm.get_data_testing()
+
         self.memory = {'S':S,'y':y,'I':I}
         self.memory_size = I.shape[0]
         self.memory_val = {'S':S_val,'y':y_val,'I':I_val}
@@ -66,8 +67,29 @@ class Agent:
                         self.network.I: I})
         return loss
 
+    def weight(self, S):
+        return self.network.sess.run(self.network.out,
+                         feed_dict={self.network.S: S})
 
+    def reset_Memory(self, selected_assets):
 
+        self.memory['S'] = self.memory['S'][:,selected_assets,:,:]
+        self.memory['y'] = self.memory['y'][:,selected_assets,:]
+        self.memory_val['S'] = self.memory_val['S'][:,selected_assets,:,:]
+        self.memory_val['y'] = self.memory_val['y'][:,selected_assets,:]
+        self.memory_test['S'] = self.memory_test['S'][:,selected_assets,:,:]
+
+    def save_model(self, file_name, step):
+        if not os.path.exists("./model"):
+            os.mkdir('model')
+        if not os.path.exists("./model/"+file_name):
+            os.mkdir('./model/'+file_name)
+
+        file_name = './model/'+ file_name +'/' +file_name + '.ckpt'
+        print('save_model',file_name)
+        self.network.saver.save(self.network.sess, file_name, global_step=step)
+        
+                    
 
 
 

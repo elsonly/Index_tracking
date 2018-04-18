@@ -7,12 +7,11 @@ class DataManager:
         self.index = config['index']
         self.start = config['start']
         self.end = config['end']
-        self.rng = config['rng']
         self.standard = config['standard']
         self.window = config['window']
         self.validation_ratio = config['validation_ratio']
         self.holding_period = config['holding_period']
-        self.testing_period = config['testing_period']
+        #self.testing_period = config['testing_period']
 
 
     def _filter(self,data, rng, standard):
