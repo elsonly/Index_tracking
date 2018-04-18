@@ -14,7 +14,7 @@ class DataManager:
         #self.testing_period = config['testing_period']
 
 
-    def _filter(self,data, rng, standard):
+    def _filter(self,data, standard):
 
         # filter out continuous same price
         rng_1 = 300
@@ -43,7 +43,7 @@ class DataManager:
             none_zero_index = (temp==0).sum(axis=1) != len(temp.columns)
             temp = temp.loc[none_zero_index,:] # drop market close data
 
-            data[item] = self._filter(temp, self.rng, self.standard)
+            data[item] = self._filter(temp, self.standard)
             # intersect rows and columns
             if k == 0:
                 col_index = set(data[item].columns)
