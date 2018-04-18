@@ -32,7 +32,7 @@ for step in range(config['training_steps']):
         LOSS_test.append(loss_test)
 
 
-#import matplotlib.pyplot as plt
+
 
 
 

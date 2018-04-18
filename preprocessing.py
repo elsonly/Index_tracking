@@ -152,7 +152,7 @@ class DataManager:
 
         y = S['close'][self.end:]
         y = y[INDEX.index[0]:]
-        print('same time index:', (y.index==INDEX.index).all())
+        #print('same time index:', (y.index==INDEX.index).all())
 
         S = pd.Panel(S).values.transpose(1,2,0) * 10 # return * 10
         S = self._to_price_tensor(S, self.window) # (m,n_assets,window,n_feature)

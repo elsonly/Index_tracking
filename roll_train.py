@@ -1,6 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
+import pickle
 
 from agent import Agent
 from config import *
@@ -16,8 +17,13 @@ while True:
     NNAgent, LOSS_train, LOSS_test = auto_train(NNAgent, config)
 
     # save model
-    model_name = config['index'] + '-' + str(NNAgent.network.n_assets)
+    model_name = config['index'] + '_' + str(NNAgent.network.n_assets)
     NNAgent.save_model( model_name, epoch)
+
+    # save assets
+    path = './model/'+ model_name+ '/' + model_name +'_assets'
+    with open(path+'.pkl', 'wb') as f:
+        pickle.dump(NNAgent.dm.assets, f) 
 
     # weight
     _w = NNAgent.weight( NNAgent.memory_val['S'] )
