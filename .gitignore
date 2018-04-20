@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # data
+data/
 us.csv
 tw.csv
 
