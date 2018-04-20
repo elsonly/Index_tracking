@@ -5,8 +5,8 @@ __pycache__/
 
 # data
 data/
-us.csv
-tw.csv
+*.csv
+*.h5
 
 #notebook
 *.ipynb
