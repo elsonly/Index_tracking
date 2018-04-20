@@ -1,6 +1,6 @@
 config = {
-	'index':'XIN9',
-	'start':'2006-01-01',
+	'index':'tw50',
+	'start':'2002-01-01',
 	'end':'2015-12-31',
 	'standard':1e-4,
 	'validation_ratio':0.1,
