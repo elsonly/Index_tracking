@@ -10,7 +10,7 @@ config = {
 	'batch_size':32,
 	'continuous_sample':False,
 
-	'learning_rate':1e-6,
+	'learning_rate':1e-5,
 	'training_steps':int(1e+5),
 	'save_model':True,
 	'save_step':1000,
