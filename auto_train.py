@@ -37,7 +37,7 @@ def auto_train(Agent, config):
             if len(LOSS_test)>1:
                 if LOSS_test[-1] < loss_test:
                     early_stop += 1
-                    if early_stop == early_stop_number:
+                    if (early_stop > early_stop_number) and (step > int(training_steps*0.4)):
                         print('step:',step,
                             'trainning loss:', loss_train,
                             'testing loss:', loss_test)

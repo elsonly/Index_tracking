@@ -13,16 +13,13 @@ class CNN:
         self.window = config['window']
         self.holding_period = config['holding_period']
         self.lr = config['learning_rate']
-
         
         if restore:
             tf.reset_default_graph()
+            self._build_network()
             model_path = tf.train.latest_checkpoint(restore)
-            saver = tf.train.import_meta_graph(model_path+'.meta')
+            saver = tf.train.Saver()
             saver.restore(self.sess, model_path)
-            all_vars = tf.trainable_variables()
-            for v in all_vars:
-                self.sess.run(v)
         else:
             self._build_network()
             self.sess.run(tf.global_variables_initializer())
