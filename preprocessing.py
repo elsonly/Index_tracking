@@ -34,7 +34,7 @@ class DataManager:
         # read target data
         INDEX = pd.read_hdf('./data/'+self.index+'_index.h5')['close'][self.start:self.end].pct_change().dropna()
         # read input data
-        items = ['close','high','low']#,'volume','open']
+        items = ['close']#,'high','low']#,'volume','open']
         data = {}
         for k, item in enumerate(items):
             #temp = pd.read_hdf('./data/'+self.index+'.h5',item)[self.start:self.end]\
@@ -144,7 +144,7 @@ class DataManager:
         INDEX = INDEX.loc[INDEX!=0]
 
         # read input data
-        items = ['close','high','low']#,'volume','open']
+        items = ['close']#,'high','low']#,'volume','open']
         S = {}
         for k,item in enumerate(items):
 
@@ -161,7 +161,7 @@ class DataManager:
         # extract intersections
         INDEX = INDEX.loc[row_index].sort_index()
         INDEX = INDEX.loc[start_test:]
-
+        self.date_testing = list(INDEX.index)
         for item in items:
             S[item] = S[item].loc[row_index].sort_index()
             m = len(S[item].loc[:self.end])
