@@ -139,32 +139,44 @@ class DataManager:
         return S_train, y_train, I_train, S_val, y_val, I_val
 
     def get_data_testing(self):
-        # read target data
-        INDEX = pd.read_hdf('./data/'+self.index+'_index.h5')['close'][self.end:].pct_change().dropna()
+        start_test = pd.to_datetime(self.end) + pd.offsets.Day()
+        INDEX = pd.read_hdf('./data/'+self.index+'_index.h5')['close'].pct_change().dropna()
         INDEX = INDEX.loc[INDEX!=0]
+
         # read input data
         items = ['close','high','low']#,'volume','open']
         S = {}
         for k,item in enumerate(items):
 
-            temp = pd.read_hdf('./data/tw.h5',item)[self.assets][self.start:].fillna(method='ffill')\
-                                                                                .pct_change().dropna(axis=0)
+            temp = pd.read_hdf('./data/tw.h5',item)[self.assets].fillna(method='ffill').pct_change().dropna(axis=0)
 
             none_zero_index = (temp==0).sum(axis=1) != len(temp.columns)
             temp = temp.loc[none_zero_index,:].sort_index() # drop market close data
 
-            m = len(temp[:self.end])
-            temp = temp.iloc[m-self.window+1:]
             S[item] = temp
 
-        y = S['close'][self.end:]
-        y = y[INDEX.index[0]:]
+        row_index = set(temp.index) & set(INDEX.index) # intersect with INDEX
+        row_index = list(row_index)
+
+        # extract intersections
+        INDEX = INDEX.loc[row_index].sort_index()
+        INDEX = INDEX.loc[start_test:]
+
+        for item in items:
+            S[item] = S[item].loc[row_index].sort_index()
+            m = len(S[item].loc[:start_test])
+            S[item] = S[item].iloc[m-self.window+1 : ]
+        
+        y = S['close'].loc[INDEX.index]
+
+
         #print('same time index:', (y.index==INDEX.index).all())
 
         S = pd.Panel(S).values.transpose(1,2,0) * 10 # return * 10
         S = self._to_price_tensor(S, self.window) # (m,n_assets,window,n_feature)
         INDEX = INDEX.values.reshape(-1,1)
         y = y.values
+        
         return S, y, INDEX
         
         
