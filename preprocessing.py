@@ -146,11 +146,9 @@ class DataManager:
         items = ['close','high','low']#,'volume','open']
         S = {}
         for k,item in enumerate(items):
-            #temp = pd.read_hdf('./data/'+self.index+'.h5',item)[self.assets][self.start:].pct_change().dropna(axis=0)
-            temp = pd.read_hdf('./data/tw.h5',item)[self.assets][self.start:].fillna(method='ffill').pct_change().dropna(axis=0)
 
-            #temp = pd.read_hdf('./data/tw.h5',item)[self.start:].dropna(how='all',axis=0).fillna(method='ffill')\
-            #                                            .pct_change().dropna(how='all',axis=0).dropna(axis=1)
+            temp = pd.read_hdf('./data/tw.h5',item)[self.assets][self.start:].fillna(method='ffill')\
+                                                                                .pct_change().dropna(axis=0)
 
             none_zero_index = (temp==0).sum(axis=1) != len(temp.columns)
             temp = temp.loc[none_zero_index,:].sort_index() # drop market close data

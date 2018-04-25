@@ -39,12 +39,13 @@ class CNN:
         with tf.name_scope('layers'):
             c1 = tf.layers.conv2d(self.S,
                                   filters=32,
-                                  kernel_size=(self.n_assets,2),
+                                  kernel_size=(self.n_assets,1),
                                   strides=(1, 1),
                                   padding='valid', 
                                   data_format='channels_last', 
                                   activation=tf.nn.relu,
                                   name='c1')
+            
             #input 4-D Tensor [batch, height, width, in_channels            
             #width = c1.get_shape()[2]
 
@@ -56,18 +57,20 @@ class CNN:
                       data_format='channels_last', 
                       activation=tf.nn.relu,
                       name='c2')
-
+            
             flatten = tf.contrib.layers.flatten(c2)
-
+            
             fc1 = tf.layers.dense(inputs=flatten,
-                                units=32,
+                                units=512,
                                 activation=tf.nn.relu,
                                 name='fc1')
+            
             #dropout = tf.layers.dropout(inputs=dense, rate=0.4)
             self.out = tf.layers.dense(inputs=fc1,
                                 units=self.n_assets,
                                 activation=tf.nn.softmax,
                                 name='out')
+            
         with tf.name_scope('loss'):
             
             out = tf.reshape(self.out,[-1, self.n_assets,1]) # out.shape=(m, n_assets)

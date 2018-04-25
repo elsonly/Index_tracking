@@ -6,7 +6,7 @@ config = {
 	'validation_ratio':0.1,
 	'testing_period':60,
 	'window':128,
-	'holding_period':20,
+	'holding_period':1,
 	'batch_size':32,
 	'continuous_sample':False,
 
