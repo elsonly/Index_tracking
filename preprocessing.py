@@ -164,8 +164,8 @@ class DataManager:
 
         for item in items:
             S[item] = S[item].loc[row_index].sort_index()
-            m = len(S[item].loc[:start_test])
-            S[item] = S[item].iloc[m-self.window+1 : ]
+            m = len(S[item].loc[:self.end])
+            S[item] = S[item].iloc[m-self.window : ]
         
         y = S['close'].loc[INDEX.index]
 
@@ -174,9 +174,10 @@ class DataManager:
 
         S = pd.Panel(S).values.transpose(1,2,0) * 10 # return * 10
         S = self._to_price_tensor(S, self.window) # (m,n_assets,window,n_feature)
-        INDEX = INDEX.values.reshape(-1,1)
+        INDEX = INDEX.values.reshape(-1,)
         y = y.values
-        
+
+        S = S[:-1]
         return S, y, INDEX
         
         
